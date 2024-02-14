@@ -12,7 +12,9 @@ import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.br.CPF;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.UUID;
 
@@ -51,7 +53,13 @@ public class UserEntity {
 
     private String code;
 
+    @Column(name = "expired_code")
+    private LocalDateTime expiredCode;
+
     private Integer validate;
+
+    @Column(name = "forgot_password")
+    private Integer forgotPassword;
 
     @Enumerated(EnumType.STRING)
     private RoleEnum role = RoleEnum.getDefault();

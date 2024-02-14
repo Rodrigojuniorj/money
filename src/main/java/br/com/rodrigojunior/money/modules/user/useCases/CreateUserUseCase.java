@@ -1,6 +1,7 @@
 package br.com.rodrigojunior.money.modules.user.useCases;
 
 import br.com.rodrigojunior.money.exceptions.UserFoundException;
+import br.com.rodrigojunior.money.modules.user.dto.UserDTO;
 import br.com.rodrigojunior.money.modules.user.entities.UserEntity;
 import br.com.rodrigojunior.money.modules.user.repositories.UserRepository;
 import br.com.rodrigojunior.money.utils.CodeGenerator;
@@ -9,6 +10,12 @@ import br.com.rodrigojunior.money.utils.email.EmailTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.sql.Timestamp;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 @Service
 public class CreateUserUseCase {
@@ -22,7 +29,7 @@ public class CreateUserUseCase {
     @Autowired
     private EmailService emailService;
 
-    public UserEntity execute(UserEntity userEntity) throws Exception {
+    public UserDTO execute(UserEntity userEntity) throws Exception {
         this.userRepository.
                 findByUsernameOrEmailOrCpf(userEntity.getUsername(), userEntity.getEmail(), userEntity.getCpf())
                 .ifPresent((user) -> {
@@ -35,6 +42,10 @@ public class CreateUserUseCase {
         userEntity.setPassword(password);
         userEntity.setCode(code);
 
+        LocalDateTime timestamp = LocalDateTime.now().plusMinutes(5); // Convertendo para java.sql.Timestamp
+
+        userEntity.setExpiredCode(timestamp);
+
         var user = this.userRepository.save(userEntity);
 
         if(user == null) {
@@ -45,6 +56,15 @@ public class CreateUserUseCase {
 
         this.emailService.sendEmail(userEntity.getEmail(), "Confirmação de código", htmlEmail);
 
-        return user;
+        var userResponse = UserDTO.builder()
+                .id(user.getId())
+                .name(user.getName())
+                .username(user.getUsername())
+                .cellphone(user.getCellphone())
+                .birthday(user.getBirthday())
+                .build();
+
+
+        return userResponse;
     }
 }

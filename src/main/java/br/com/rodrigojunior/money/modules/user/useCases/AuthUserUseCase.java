@@ -43,10 +43,10 @@ public class AuthUserUseCase {
         Algorithm algorithm = Algorithm.HMAC256(secretKey);
         var expiresIn = Instant.now().plus(Duration.ofHours(2));
 
-        var token = JWT.create().withIssuer("javagas")
+        var token = JWT.create().withIssuer("money")
                 .withExpiresAt(expiresIn)
                 .withSubject(user.getId().toString())
-                .withClaim("roles", Arrays.asList("COMPANY"))
+                .withClaim("roles", Arrays.asList(user.getRole().toString()))
                 .sign(algorithm);
 
         var authUserResponseDto = AuthUserResponseDTO.builder()
