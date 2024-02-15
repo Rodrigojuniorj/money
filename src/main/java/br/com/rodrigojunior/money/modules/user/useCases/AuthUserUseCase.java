@@ -28,11 +28,15 @@ public class AuthUserUseCase {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public AuthUserResponseDTO execute(AuthUserDTO authUserDTO) throws AuthenticationException {
+    public AuthUserResponseDTO execute(AuthUserDTO authUserDTO) throws Exception {
         var user = this.userRepository.findByUsername(authUserDTO.getUsername())
                 .orElseThrow(() -> {
                     throw new UsernameNotFoundException("Username/password incorrect");
                 });
+
+        if(user.getValidate() == null){
+            throw new Exception("Usuário ainda não foi válidado!");
+        }
 
         var passwordMatches = this.passwordEncoder.matches(authUserDTO.getPassword(), user.getPassword());
 

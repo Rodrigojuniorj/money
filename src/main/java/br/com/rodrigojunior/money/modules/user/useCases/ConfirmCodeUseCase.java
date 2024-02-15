@@ -20,7 +20,9 @@ public class ConfirmCodeUseCase {
 
         var user = this.userRepository.findByEmail(confirmCodeDTO.getEmail());
 
-        if(user.getValidate() == 1) {
+        Integer validate = user.getValidate();
+
+        if(validate != null) {
             throw new Exception("Esse usuário já está válido.");
         }
 
